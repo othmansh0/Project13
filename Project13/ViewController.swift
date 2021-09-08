@@ -23,7 +23,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
     var currentImage: UIImage!
     
     var context: CIContext!
-    var filter: CIFilter!
+    var currentFilter: CIFilter!
     
     
     override func viewDidLoad() {
@@ -33,7 +33,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(importPicture))
         
         context = CIContext()
-        filter = CIFilter(name: "CISepiaTone")
+        currentFilter = CIFilter(name: "CISepiaTone")
     }
 
     @IBAction func changeFilter(_ sender: Any) {
@@ -42,6 +42,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
     @IBAction func save(_ sender: Any) {
     }
     @IBAction func intensityChanged(_ sender: Any) {
+        applyProcessing()
     }
     
     @objc func importPicture(){
@@ -56,11 +57,30 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
         dismiss(animated: true)
         currentImage = image
         
-        
+        //let users drag the slider up and down to add varying amounts of sepia effect to the image they select
+       //CIImage from UIImage
+        let beginImage = CIImage(image: currentImage)
+        //Send results to filter
+        currentFilter.setValue(beginImage, forKey: kCIInputImageKey)
+        applyProcessing()
         
     }
     
-    
+    func applyProcessing() {
+        guard let outputImage = currentFilter.outputImage else { return }
+        
+        //Setting intensity to slider's value
+        currentFilter.setValue(intensity.value, forKey: kCIInputIntensityKey)
+        
+        //reading the final rendered image as UIImage
+        //Converting from CIImage to UIImage takes extra step
+        //CIImage to CGImage to UIImage
+        //We need to specify which part of the image we want to render .extent means all of it
+        if let cgImage = context.createCGImage(outputImage, from: outputImage.extent){
+            let processedImage = UIImage(cgImage: cgImage)
+            imageView.image = processedImage
+        }
+    }
     
 }
 
