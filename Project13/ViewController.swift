@@ -99,10 +99,32 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
     }
     
     func applyProcessing() {
+        
         guard let outputImage = currentFilter.outputImage else { return }
         
         //Setting intensity to slider's value
-        currentFilter.setValue(intensity.value, forKey: kCIInputIntensityKey)
+        //currentFilter.setValue(intensity.value, forKey: kCIInputIntensityKey)
+        //line 105 doesnt work with all filters since not all of them have intensity key
+        let inputKeys = currentFilter.inputKeys
+        
+        if inputKeys.contains(kCIInputIntensityKey){
+            currentFilter.setValue(intensity.value, forKey: kCIInputIntensityKey)
+        }
+        
+        if inputKeys.contains(kCIInputRadiusKey) {
+            currentFilter.setValue(intensity.value * 200, forKey: kCIInputRadiusKey)
+        }
+        
+        if inputKeys.contains(kCIInputScaleKey) {
+            currentFilter.setValue(intensity.value * 10, forKey: kCIInputScaleKey)
+        }
+        
+        if inputKeys.contains(kCIInputCenterKey) {
+            currentFilter.setValue(CIVector(x: currentImage.size.width / 2, y: currentImage.size.height / 2), forKey: kCIInputCenterKey)
+        }
+        
+        
+        
         
         //reading the final rendered image as UIImage
         //Converting from CIImage to UIImage takes extra step
