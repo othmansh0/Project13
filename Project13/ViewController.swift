@@ -5,6 +5,16 @@
 //  Created by othman shahrouri on 9/7/21.
 //
 
+
+//Context core image component that handles rendering
+//creating a context is computationally expensive so we create it once as global
+
+//Filter stores the filter user has activated
+
+
+
+
+import CoreImage
 import UIKit
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
@@ -12,12 +22,18 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
     @IBOutlet var intensity: UISlider!
     var currentImage: UIImage!
     
+    var context: CIContext!
+    var filter: CIFilter!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
        
         title = "Instafilter "
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(importPicture))
         
+        context = CIContext()
+        filter = CIFilter(name: "CISepiaTone")
     }
 
     @IBAction func changeFilter(_ sender: Any) {
@@ -39,6 +55,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
         guard let image = info[.editedImage] as? UIImage else { return }
         dismiss(animated: true)
         currentImage = image
+        
+        
+        
     }
     
     
