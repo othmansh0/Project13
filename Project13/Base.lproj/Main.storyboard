@@ -53,6 +53,7 @@
                                     <constraint firstAttribute="height" constant="44" id="2AY-O4-qVG"/>
                                     <constraint firstAttribute="width" constant="120" id="hqB-1Y-WNo"/>
                                 </constraints>
+                                <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="15"/>
                                 <state key="normal" title="Change Filter"/>
                                 <connections>
                                     <action selector="changeFilter:" destination="BYZ-38-t0r" eventType="touchUpInside" id="iUl-jX-zfj"/>
@@ -91,6 +92,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="o6N-Tj-Lxy"/>
                     <connections>
+                        <outlet property="changeFilter" destination="aLt-8e-tJz" id="TNN-l6-C0q"/>
                         <outlet property="imageView" destination="Y1R-0H-7uM" id="cjw-FJ-wN8"/>
                         <outlet property="intensity" destination="5Ab-Pe-hi0" id="3J3-nS-PgB"/>
                     </connections>

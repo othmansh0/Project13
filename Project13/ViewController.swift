@@ -20,7 +20,9 @@ import UIKit
 class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var intensity: UISlider!
+    @IBOutlet var changeFilter: UIButton!
     var currentImage: UIImage!
+    var filterName: String!
     
     var context: CIContext!
     var currentFilter: CIFilter!
@@ -34,6 +36,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
         
         context = CIContext()
         currentFilter = CIFilter(name: "CISepiaTone")
+        
     }
 
     //sneder changed from Any to UIButton so we can pin our ac to a button
@@ -54,20 +57,21 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
             //Used here is the view it come from then here rectangle around that
             popoverController.sourceRect = sender.bounds
         }
-        
+       
            present(ac, animated: true)
     }
     func setFilter(action: UIAlertAction) {
         //make sure we have image
+        guard let actionTitle = action.title else { return }
+        changeFilter.setTitle(actionTitle, for: .normal)
+      
         guard currentImage != nil else { return }
         
-        guard let actionTitle = action.title else { return }
-        
         currentFilter = CIFilter(name: actionTitle)
+        
         let beginImage = CIImage(image: currentImage)
         currentFilter.setValue(beginImage, forKey: kCIInputImageKey)
         applyProcessing()
-       
     }
     
     @IBAction func save(_ sender: Any) {
@@ -129,8 +133,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
         if inputKeys.contains(kCIInputCenterKey) {
             currentFilter.setValue(CIVector(x: currentImage.size.width / 2, y: currentImage.size.height / 2), forKey: kCIInputCenterKey)
         }
-        
-        
         
         
         //reading the final rendered image as UIImage
