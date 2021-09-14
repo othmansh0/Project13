@@ -20,6 +20,7 @@ import UIKit
 class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var intensity: UISlider!
+    @IBOutlet var radius: UISlider!
     @IBOutlet var changeFilter: UIButton!
     var currentImage: UIImage!
     var filterName: String!
@@ -31,6 +32,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
     override func viewDidLoad() {
         super.viewDidLoad()
        
+        imageView.alpha = 0
         title = "Instafilter "
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(importPicture))
         
@@ -75,15 +77,15 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
     }
     
     @IBAction func save(_ sender: Any) {
-        guard let image = imageView.image else {
-            let ac = UIAlertController(title: "No image selected", message: nil, preferredStyle: .alert)
-            ac.addAction(UIAlertAction(title: "Insert Image", style: .default, handler: importPicture))
-            present(ac,animated: true)
-            return
-        }
-        UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+        guard let image = imageView.image else { return }
+
+           UIImageWriteToSavedPhotosAlbum(image, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
     }
     @IBAction func intensityChanged(_ sender: Any) {
+        applyProcessing()
+    }
+    
+    @IBAction func radiusChanged(_ sender: Any) {
         applyProcessing()
     }
     
@@ -92,6 +94,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
         picker.allowsEditing = true
         picker.delegate = self
         present(picker, animated: true)
+       
+
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -123,7 +127,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
         }
         
         if inputKeys.contains(kCIInputRadiusKey) {
-            currentFilter.setValue(intensity.value * 200, forKey: kCIInputRadiusKey)
+            currentFilter.setValue(radius.value * 200, forKey: kCIInputRadiusKey)
         }
         
         if inputKeys.contains(kCIInputScaleKey) {
@@ -141,22 +145,27 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate & UINavi
         //We need to specify which part of the image we want to render .extent means all of it
         if let cgImage = context.createCGImage(outputImage, from: outputImage.extent){
             let processedImage = UIImage(cgImage: cgImage)
-            imageView.image = processedImage
+            UIView.animate(withDuration: 7, delay: 0, options: []) {
+                self.imageView.alpha = 1
+                self.imageView.image = processedImage
+            } completion: { finished in
+                
+            }
+           
         }
     }
     
-   @objc func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-    if let error = error {
-         // we got back an error!
-         let ac = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
-         ac.addAction(UIAlertAction(title: "OK", style: .default))
-         present(ac, animated: true)
-     } else {
-         let ac = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: .alert)
-         ac.addAction(UIAlertAction(title: "OK", style: .default))
-         present(ac, animated: true)
-     }
-        
+    @objc func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        if let error = error {
+            // we got back an error!
+            let ac = UIAlertController(title: "Save error", message: error.localizedDescription, preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default))
+            present(ac, animated: true)
+        } else {
+            let ac = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .default))
+            present(ac, animated: true)
+        }
     }
 }
 
